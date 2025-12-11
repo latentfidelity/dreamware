@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreamware</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg,
+                #87CEEB 0%,
+                #6BB3E0 30%,
+                #4A9BD9 60%,
+                #3B8DD4 100%
+            );
+            position: relative;
+        }
+
+        .sky-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        /* Animated Rainbow Arcs */
+        .rainbow {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.3;
+            filter: blur(2px);
+        }
+
+        .rainbow-1 {
+            width: 800px;
+            height: 400px;
+            top: 30%;
+            left: -200px;
+            background:
+                transparent 0%,
+                transparent 40%,
+                rgba(255, 0, 0, 0.3) 40%,
+                rgba(255, 127, 0, 0.3) 45%,
+                rgba(255, 255, 0, 0.3) 50%,
+                rgba(0, 255, 0, 0.3) 55%,
+                rgba(0, 0, 255, 0.3) 60%,
+                rgba(75, 0, 130, 0.3) 65%,
+                rgba(148, 0, 211, 0.3) 70%,
+                transparent 70%;
+            background: conic-gradient(
+                from 180deg at 50% 100%,
+                transparent 0deg,
+                rgba(148, 0, 211, 0.2) 10deg,
+                rgba(75, 0, 130, 0.2) 20deg,
+                rgba(0, 0, 255, 0.2) 30deg,
+                rgba(0, 255, 0, 0.2) 40deg,
+                rgba(255, 255, 0, 0.2) 50deg,
+                rgba(255, 127, 0, 0.2) 60deg,
+                rgba(255, 0, 0, 0.2) 70deg,
+                transparent 80deg,
+                transparent 180deg
+            );
+            animation: rainbow-float 20s ease-in-out infinite;
+        }
+
+        .rainbow-2 {
+            width: 600px;
+            height: 300px;
+            top: 50%;
+            right: -150px;
+            background: conic-gradient(
+                from 180deg at 50% 100%,
+                transparent 100deg,
+                rgba(255, 0, 0, 0.15) 110deg,
+                rgba(255, 127, 0, 0.15) 120deg,
+                rgba(255, 255, 0, 0.15) 130deg,
+                rgba(0, 255, 0, 0.15) 140deg,
+                rgba(0, 0, 255, 0.15) 150deg,
+                rgba(148, 0, 211, 0.15) 160deg,
+                transparent 170deg
+            );
+            animation: rainbow-float 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes rainbow-float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+            50% { transform: translateY(-20px) scale(1.05); opacity: 0.4; }
+        }
+
+        /* Cloud Styles */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 100px;
+            filter: blur(1px);
+            opacity: 0.9;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .cloud-1 {
+            width: 200px;
+            height: 60px;
+            top: 10%;
+            animation: cloud-float 30s linear infinite;
+        }
+        .cloud-1::before {
+            width: 100px;
+            height: 80px;
+            top: -40px;
+            left: 30px;
+        }
+        .cloud-1::after {
+            width: 70px;
+            height: 70px;
+            top: -35px;
+            left: 90px;
+        }
+
+        .cloud-2 {
+            width: 150px;
+            height: 45px;
+            top: 25%;
+            animation: cloud-float 35s linear infinite;
+            animation-delay: -10s;
+            opacity: 0.8;
+        }
+        .cloud-2::before {
+            width: 70px;
+            height: 55px;
+            top: -30px;
+            left: 20px;
+        }
+        .cloud-2::after {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 70px;
+        }
+
+        .cloud-3 {
+            width: 180px;
+            height: 50px;
+            top: 15%;
+            animation: cloud-float 40s linear infinite;
+            animation-delay: -20s;
+            opacity: 0.7;
+        }
+        .cloud-3::before {
+            width: 80px;
+            height: 65px;
+            top: -35px;
+            left: 25px;
+        }
+        .cloud-3::after {
+            width: 60px;
+            height: 55px;
+            top: -28px;
+            left: 85px;
+        }
+
+        .cloud-4 {
+            width: 120px;
+            height: 35px;
+            top: 35%;
+            animation: cloud-float 45s linear infinite;
+            animation-delay: -5s;
+            opacity: 0.6;
+        }
+        .cloud-4::before {
+            width: 55px;
+            height: 45px;
+            top: -25px;
+            left: 15px;
+        }
+        .cloud-4::after {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 55px;
+        }
+
+        .cloud-5 {
+            width: 160px;
+            height: 48px;
+            top: 8%;
+            animation: cloud-float 38s linear infinite;
+            animation-delay: -15s;
+            opacity: 0.85;
+        }
+        .cloud-5::before {
+            width: 75px;
+            height: 60px;
+            top: -32px;
+            left: 22px;
+        }
+        .cloud-5::after {
+            width: 55px;
+            height: 52px;
+            top: -26px;
+            left: 78px;
+        }
+
+        .cloud-6 {
+            width: 140px;
+            height: 42px;
+            top: 42%;
+            animation: cloud-float 50s linear infinite;
+            animation-delay: -25s;
+            opacity: 0.5;
+        }
+        .cloud-6::before {
+            width: 65px;
+            height: 52px;
+            top: -28px;
+            left: 18px;
+        }
+        .cloud-6::after {
+            width: 48px;
+            height: 46px;
+            top: -23px;
+            left: 65px;
+        }
+
+        @keyframes cloud-float {
+            0% { transform: translateX(-300px); }
+            100% { transform: translateX(calc(100vw + 300px)); }
+        }
+
+        /* Main Content */
+        .content {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 100vh;
+            padding: 60px 20px 40px;
+        }
+
+        .logo-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo {
+            max-width: 90%;
+            width: 600px;
+            height: auto;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15));
+            animation: logo-float 6s ease-in-out infinite;
+        }
+
+        @keyframes logo-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* iOS Glass Input Container */
+        .input-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        .glass-input-wrapper {
+            position: relative;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .glass-input-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg,
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(255, 255, 255, 0.1) 100%
+            );
+            pointer-events: none;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .glass-input {
+            width: 100%;
+            padding: 18px 24px;
+            font-size: 17px;
+            font-weight: 400;
+            color: rgba(0, 0, 0, 0.8);
+            background: transparent;
+            border: none;
+            outline: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass-input::placeholder {
+            color: rgba(0, 0, 0, 0.45);
+            font-weight: 400;
+        }
+
+        .glass-input:focus {
+            outline: none;
+        }
+
+        .glass-input-wrapper:focus-within {
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.15),
+                0 0 0 4px rgba(255, 255, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        /* Subtle light reflection animation */
+        @keyframes glass-shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .glass-input-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 100%
+            );
+            background-size: 200% 100%;
+            animation: glass-shimmer 8s ease-in-out infinite;
+            pointer-events: none;
+            border-radius: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo {
+                width: 85%;
+                max-width: 400px;
+            }
+
+            .glass-input {
+                font-size: 16px;
+                padding: 16px 20px;
+            }
+
+            .content {
+                padding: 40px 15px 30px;
+            }
+        }
+
+        /* Glass Terminal Overlay */
+        .terminal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .terminal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .glass-terminal {
+            width: 90%;
+            max-width: 900px;
+            height: 80vh;
+            max-height: 650px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow:
+                0 25px 80px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .terminal-overlay.active .glass-terminal {
+            transform: scale(1) translateY(0);
+        }
+
+        .terminal-header {
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .terminal-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .terminal-btn:hover {
+            opacity: 0.8;
+        }
+
+        .terminal-btn.close { background: #ff5f57; }
+        .terminal-btn.minimize { background: #ffbd2e; }
+        .terminal-btn.maximize { background: #28ca41; }
+
+        .terminal-title {
+            flex: 1;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .terminal-body {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .dreaming-header {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            animation: pulse-fade 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-fade {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.7; }
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .loading-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg,
+                rgba(255, 255, 255, 0.6),
+                rgba(147, 197, 253, 0.8),
+                rgba(196, 181, 253, 0.8)
+            );
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .loading-text {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+
+        .code-output {
+            display: none;
+        }
+
+        .code-output.visible {
+            display: block;
+            animation: fade-in 0.5s ease;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .code-line {
+            margin: 4px 0;
+            opacity: 0;
+            animation: type-in 0.3s ease forwards;
+        }
+
+        .code-comment { color: rgba(255, 255, 255, 0.4); }
+        .code-selector { color: #93c5fd; }
+        .code-property { color: #c4b5fd; }
+        .code-value { color: #86efac; }
+        .code-bracket { color: rgba(255, 255, 255, 0.7); }
+        .code-title { color: #fcd34d; font-weight: 600; }
+
+        @keyframes type-in {
+            from { opacity: 0; transform: translateX(-5px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.7);
+            margin-left: 2px;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Terminal Content Layout */
+        .terminal-content {
+            display: flex;
+            gap: 24px;
+            height: 100%;
+        }
+
+        /* Phone Mockup */
+        .phone-container {
+            display: none;
+            flex-shrink: 0;
+        }
+
+        .phone-container.visible {
+            display: block;
+            animation: phone-slide-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes phone-slide-in {
+            from { opacity: 0; transform: translateX(-30px) scale(0.9); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
+        .phone-frame {
+            width: 220px;
+            height: 440px;
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            border-radius: 36px;
+            padding: 8px;
+            box-shadow:
+                0 25px 50px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 24px;
+            background: #000;
+            border-radius: 12px;
+            z-index: 10;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(160deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            border-radius: 28px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* App Inside Phone */
+        .app-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+        }
+
+        .app-status-bar {
+            padding: 36px 16px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+
+        .app-status-icons {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .app-header {
+            padding: 8px 16px 12px;
+        }
+
+        .app-title {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a78bfa, #f472b6, #fb923c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+
+        .app-subtitle {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .app-content {
+            flex: 1;
+            padding: 0 12px 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Fancy Widgets */
+        .widget {
+            border-radius: 16px;
+            padding: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .widget-stats {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.2));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .widget-stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+        }
+
+        .widget-progress {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .widget-progress-fill {
+            height: 100%;
+            width: 72%;
+            background: linear-gradient(90deg, #a78bfa, #f472b6);
+            border-radius: 2px;
+            animation: progress-animate 2s ease-in-out infinite;
+        }
+
+        @keyframes progress-animate {
+            0%, 100% { width: 72%; }
+            50% { width: 85%; }
+        }
+
+        .widget-chart {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 70px;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            padding-bottom: 8px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(180deg, #3b82f6, #10b981);
+            border-radius: 3px 3px 0 0;
+            animation: bar-grow 1s ease-out forwards;
+        }
+
+        @keyframes bar-grow {
+            from { height: 0; }
+        }
+
+        .widget-cards {
+            display: flex;
+            gap: 6px;
+        }
+
+        .mini-card {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(251, 146, 60, 0.3), rgba(251, 191, 36, 0.2));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        .mini-card-icon {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .mini-card-text {
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .widget-list {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .list-dot.green { background: #10b981; }
+        .list-dot.blue { background: #3b82f6; }
+        .list-dot.purple { background: #a78bfa; }
+
+        .list-text {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.7);
+            flex: 1;
+        }
+
+        .list-badge {
+            font-size: 8px;
+            padding: 2px 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .app-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-item {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
+        }
+
+        .nav-dot {
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+        }
+
+        .nav-item.active .nav-dot {
+            background: #fff;
+        }
+
+        /* Code Section */
+        .code-section {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+        }
+
+        .code-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .code-section::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .code-section::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .code-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="sky-container">
+        <!-- Rainbows -->
+        <div class="rainbow rainbow-1"></div>
+        <div class="rainbow rainbow-2"></div>
+
+        <!-- Clouds -->
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="cloud cloud-4"></div>
+        <div class="cloud cloud-5"></div>
+        <div class="cloud cloud-6"></div>
+    </div>
+
+    <div class="content">
+        <div class="logo-container">
+            <img src="dreamware-logo.png" alt="Dreamware" class="logo">
+        </div>
+
+        <div class="input-container">
+            <div class="glass-input-wrapper">
+                <input type="text" class="glass-input" id="dreamInput" placeholder="Start dreaming up the next killer app.">
+            </div>
+        </div>
+    </div>
+
+    <!-- Glass Terminal Overlay -->
+    <div class="terminal-overlay" id="terminalOverlay">
+        <div class="glass-terminal">
+            <div class="terminal-header">
+                <div class="terminal-btn close" id="closeTerminal"></div>
+                <div class="terminal-btn minimize"></div>
+                <div class="terminal-btn maximize"></div>
+                <div class="terminal-title">dreamware — generating</div>
+            </div>
+            <div class="terminal-body">
+                <div class="terminal-content">
+                    <!-- Phone Mockup -->
+                    <div class="phone-container" id="phoneContainer">
+                        <div class="phone-frame">
+                            <div class="phone-screen">
+                                <div class="app-container">
+                                    <div class="app-status-bar">
+                                        <span>9:41</span>
+                                        <div class="app-status-icons">
+                                            <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><path d="M1 4h2v8H1zM5 2h2v10H5zM9 0h2v12H9zM13 3h2v9h-2z" opacity="0.9"/></svg>
+                                            <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><path d="M14 2H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-1 5H3V5h10v2z" opacity="0.9"/></svg>
+                                        </div>
+                                    </div>
+                                    <div class="app-header">
+                                        <div class="app-title" id="appTitle">My new app</div>
+                                        <div class="app-subtitle">Dashboard Overview</div>
+                                    </div>
+                                    <div class="app-content">
+                                        <!-- Stats Widget -->
+                                        <div class="widget widget-stats">
+                                            <div class="widget-stats-row">
+                                                <div class="stat-item">
+                                                    <div class="stat-value">2.4k</div>
+                                                    <div class="stat-label">Users</div>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <div class="stat-value">$12k</div>
+                                                    <div class="stat-label">Revenue</div>
+                                                </div>
+                                                <div class="stat-item">
+                                                    <div class="stat-value">89%</div>
+                                                    <div class="stat-label">Growth</div>
+                                                </div>
+                                            </div>
+                                            <div class="widget-progress">
+                                                <div class="widget-progress-fill"></div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Chart Widget -->
+                                        <div class="widget widget-chart">
+                                            <div class="chart-bar" style="height: 45%"></div>
+                                            <div class="chart-bar" style="height: 65%"></div>
+                                            <div class="chart-bar" style="height: 35%"></div>
+                                            <div class="chart-bar" style="height: 80%"></div>
+                                            <div class="chart-bar" style="height: 55%"></div>
+                                            <div class="chart-bar" style="height: 90%"></div>
+                                            <div class="chart-bar" style="height: 70%"></div>
+                                        </div>
+
+                                        <!-- Mini Cards -->
+                                        <div class="widget-cards">
+                                            <div class="mini-card">
+                                                <div class="mini-card-icon">⚡</div>
+                                                <div class="mini-card-text">Quick</div>
+                                            </div>
+                                            <div class="mini-card">
+                                                <div class="mini-card-icon">🎯</div>
+                                                <div class="mini-card-text">Goals</div>
+                                            </div>
+                                            <div class="mini-card">
+                                                <div class="mini-card-icon">✨</div>
+                                                <div class="mini-card-text">New</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- List Widget -->
+                                        <div class="widget widget-list">
+                                            <div class="list-item">
+                                                <div class="list-dot green"></div>
+                                                <span class="list-text">Design system</span>
+                                                <span class="list-badge">Done</span>
+                                            </div>
+                                            <div class="list-item">
+                                                <div class="list-dot blue"></div>
+                                                <span class="list-text">API integration</span>
+                                                <span class="list-badge">75%</span>
+                                            </div>
+                                            <div class="list-item">
+                                                <div class="list-dot purple"></div>
+                                                <span class="list-text">Testing</span>
+                                                <span class="list-badge">New</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bottom Nav -->
+                                    <div class="app-nav">
+                                        <div class="nav-item active"><div class="nav-dot"></div></div>
+                                        <div class="nav-item"><div class="nav-dot"></div></div>
+                                        <div class="nav-item"><div class="nav-dot"></div></div>
+                                        <div class="nav-item"><div class="nav-dot"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Section -->
+                    <div class="code-section">
+                        <div class="dreaming-header">dreaming up your app...</div>
+
+                        <div class="loading-container" id="loadingContainer">
+                            <div class="loading-bar">
+                                <div class="loading-bar-fill" id="loadingBarFill"></div>
+                            </div>
+                            <div class="loading-text" id="loadingText">Initializing...</div>
+                        </div>
+
+                        <div class="code-output" id="codeOutput"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dreamInput = document.getElementById('dreamInput');
+        const terminalOverlay = document.getElementById('terminalOverlay');
+        const closeTerminal = document.getElementById('closeTerminal');
+        const loadingBarFill = document.getElementById('loadingBarFill');
+        const loadingText = document.getElementById('loadingText');
+        const loadingContainer = document.getElementById('loadingContainer');
+        const codeOutput = document.getElementById('codeOutput');
+        const phoneContainer = document.getElementById('phoneContainer');
+        const appTitle = document.getElementById('appTitle');
+
+        const loadingSteps = [
+            { progress: 15, text: 'Analyzing requirements...' },
+            { progress: 30, text: 'Designing component architecture...' },
+            { progress: 45, text: 'Generating styles...' },
+            { progress: 60, text: 'Building layout system...' },
+            { progress: 75, text: 'Optimizing for performance...' },
+            { progress: 90, text: 'Finalizing code...' },
+            { progress: 100, text: 'Complete!' }
+        ];
+
+        function generateCSS(appName) {
+            const slug = appName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            return [
+                { type: 'comment', text: `/* ${appName} - Generated by Dreamware */` },
+                { type: 'blank', text: '' },
+                { type: 'selector', text: `.${slug}-container` },
+                { type: 'bracket', text: '{' },
+                { type: 'property', text: '  display', value: 'flex' },
+                { type: 'property', text: '  flex-direction', value: 'column' },
+                { type: 'property', text: '  min-height', value: '100vh' },
+                { type: 'property', text: '  background', value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+                { type: 'bracket', text: '}' },
+                { type: 'blank', text: '' },
+                { type: 'selector', text: `.${slug}-header` },
+                { type: 'bracket', text: '{' },
+                { type: 'property', text: '  padding', value: '2rem' },
+                { type: 'property', text: '  backdrop-filter', value: 'blur(20px)' },
+                { type: 'property', text: '  background', value: 'rgba(255, 255, 255, 0.1)' },
+                { type: 'property', text: '  border-bottom', value: '1px solid rgba(255, 255, 255, 0.2)' },
+                { type: 'bracket', text: '}' },
+                { type: 'blank', text: '' },
+                { type: 'selector', text: `.${slug}-title` },
+                { type: 'bracket', text: '{' },
+                { type: 'property', text: '  font-size', value: '2.5rem' },
+                { type: 'property', text: '  font-weight', value: '700' },
+                { type: 'property', text: '  color', value: '#ffffff' },
+                { type: 'property', text: '  text-shadow', value: '0 2px 10px rgba(0, 0, 0, 0.2)' },
+                { type: 'bracket', text: '}' },
+                { type: 'blank', text: '' },
+                { type: 'selector', text: `.${slug}-content` },
+                { type: 'bracket', text: '{' },
+                { type: 'property', text: '  flex', value: '1' },
+                { type: 'property', text: '  padding', value: '3rem' },
+                { type: 'property', text: '  display', value: 'grid' },
+                { type: 'property', text: '  gap', value: '2rem' },
+                { type: 'bracket', text: '}' },
+            ];
+        }
+
+        function formatCodeLine(line) {
+            if (line.type === 'comment') {
+                return `<span class="code-comment">${line.text}</span>`;
+            } else if (line.type === 'selector') {
+                return `<span class="code-selector">${line.text}</span>`;
+            } else if (line.type === 'bracket') {
+                return `<span class="code-bracket">${line.text}</span>`;
+            } else if (line.type === 'property') {
+                return `<span class="code-property">${line.text}</span>: <span class="code-value">${line.value}</span>;`;
+            } else if (line.type === 'blank') {
+                return '&nbsp;';
+            }
+            return line.text;
+        }
+
+        async function runLoadingSequence() {
+            for (let i = 0; i < loadingSteps.length; i++) {
+                const step = loadingSteps[i];
+                loadingBarFill.style.width = step.progress + '%';
+                loadingText.textContent = step.text;
+                await new Promise(resolve => setTimeout(resolve, 400));
+            }
+        }
+
+        async function typeCode(appName) {
+            const lines = generateCSS(appName);
+            codeOutput.innerHTML = '';
+            codeOutput.classList.add('visible');
+
+            for (let i = 0; i < lines.length; i++) {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'code-line';
+                lineDiv.style.animationDelay = `${i * 0.05}s`;
+                lineDiv.innerHTML = formatCodeLine(lines[i]);
+                codeOutput.appendChild(lineDiv);
+                await new Promise(resolve => setTimeout(resolve, 80));
+            }
+
+            // Add cursor at the end
+            const cursorSpan = document.createElement('span');
+            cursorSpan.className = 'cursor';
+            codeOutput.appendChild(cursorSpan);
+        }
+
+        async function showPhonePreview(appName) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            appTitle.textContent = appName;
+            phoneContainer.classList.add('visible');
+        }
+
+        async function startDreaming(prompt) {
+            // Reset state
+            loadingBarFill.style.width = '0%';
+            loadingText.textContent = 'Initializing...';
+            loadingContainer.style.display = 'flex';
+            codeOutput.classList.remove('visible');
+            codeOutput.innerHTML = '';
+            phoneContainer.classList.remove('visible');
+
+            // Show terminal
+            terminalOverlay.classList.add('active');
+
+            // Run sequence
+            await runLoadingSequence();
+            await new Promise(resolve => setTimeout(resolve, 300));
+            loadingContainer.style.display = 'none';
+            await typeCode(prompt);
+            await showPhonePreview(prompt);
+        }
+
+        // Event listeners
+        dreamInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && dreamInput.value.trim()) {
+                startDreaming(dreamInput.value.trim());
+            }
+        });
+
+        closeTerminal.addEventListener('click', () => {
+            terminalOverlay.classList.remove('active');
+            dreamInput.value = '';
+        });
+
+        terminalOverlay.addEventListener('click', (e) => {
+            if (e.target === terminalOverlay) {
+                terminalOverlay.classList.remove('active');
+                dreamInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>
