@@ -1134,9 +1134,26 @@
         let ws = null;
         let currentCode = '';
         let isGenerating = false;
+        let useSSE = false; // Will be true on Vercel
+        let eventSource = null;
 
-        // WebSocket connection
+        // Detect if we're on Vercel (no WebSocket server)
+        const isVercel = window.location.hostname.includes('vercel.app') ||
+                         window.location.hostname.includes('vercel') ||
+                         !window.location.hostname.includes('localhost');
+
+        // WebSocket connection (for local development)
         function connectWebSocket() {
+            if (isVercel) {
+                // Use SSE on Vercel
+                useSSE = true;
+                console.log('Running on Vercel - using SSE');
+                connectionStatus.classList.add('visible', 'connected');
+                connectionText.textContent = 'Ready';
+                setTimeout(() => connectionStatus.classList.remove('visible'), 2000);
+                return;
+            }
+
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const wsUrl = `${protocol}//${window.location.host}`;
 
@@ -1166,6 +1183,44 @@
                 const message = JSON.parse(event.data);
                 handleServerMessage(message);
             };
+        }
+
+        // SSE-based generation (for Vercel)
+        async function startDreamingSSE(prompt) {
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const message = JSON.parse(line.slice(6));
+                                handleServerMessage(message);
+                            } catch (e) {
+                                // Ignore parse errors
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('SSE error:', error);
+                onError(error.message);
+            }
         }
 
         // Handle messages from server
@@ -1314,13 +1369,16 @@
 
         // Start generation
         function startDreaming(prompt) {
-            if (!ws || ws.readyState !== WebSocket.OPEN) {
+            // Check connection based on mode
+            if (!useSSE && (!ws || ws.readyState !== WebSocket.OPEN)) {
                 alert('Not connected to server. Please wait...');
                 return;
             }
 
             if (isGenerating) {
-                ws.send(JSON.stringify({ type: 'cancel' }));
+                if (!useSSE && ws) {
+                    ws.send(JSON.stringify({ type: 'cancel' }));
+                }
                 return;
             }
 
@@ -1338,11 +1396,16 @@
             terminalOverlay.classList.add('active');
             thinkingContainer.classList.add('visible');
 
-            // Send generation request
-            ws.send(JSON.stringify({
-                type: 'generate',
-                prompt: prompt
-            }));
+            if (useSSE) {
+                // Use SSE for Vercel
+                startDreamingSSE(prompt);
+            } else {
+                // Use WebSocket for local
+                ws.send(JSON.stringify({
+                    type: 'generate',
+                    prompt: prompt
+                }));
+            }
         }
 
         // Download generated app
@@ -1362,8 +1425,11 @@
 
         // Close terminal and cancel if generating
         function closeTerminalPanel() {
-            if (isGenerating && ws) {
-                ws.send(JSON.stringify({ type: 'cancel' }));
+            if (isGenerating) {
+                if (!useSSE && ws) {
+                    ws.send(JSON.stringify({ type: 'cancel' }));
+                }
+                isGenerating = false;
             }
             terminalOverlay.classList.remove('active');
             thinkingContainer.classList.remove('visible');
