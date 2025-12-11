@@ -106,23 +106,15 @@ async function handleGenerate(sessionId, prompt) {
   session.abortController = abortController;
 
   // Send initial status
-  ws.send(JSON.stringify({ type: 'status', phase: 'starting', message: 'Initializing Dreamware agent...' }));
+  ws.send(JSON.stringify({ type: 'status', phase: 'connecting', message: 'Dreamware is waking up...' }));
 
   try {
-    const phases = [
-      { progress: 10, message: 'Analyzing your requirements...' },
-      { progress: 25, message: 'Designing component architecture...' },
-      { progress: 40, message: 'Generating styles and layout...' },
-      { progress: 60, message: 'Building interactive elements...' },
-      { progress: 80, message: 'Optimizing and polishing...' },
-    ];
-
-    let currentPhase = 0;
     let fullResponse = '';
     let codeStarted = false;
     let codeContent = '';
+    let lastAnalysisSent = '';
 
-    // Start the agent query
+    // Start the agent query with streaming
     const agentQuery = query({
       prompt: `Create an app: ${prompt}`,
       options: {
@@ -132,35 +124,53 @@ async function handleGenerate(sessionId, prompt) {
         permissionMode: 'bypassPermissions',
         allowDangerouslySkipPermissions: true,
         maxTurns: 1,
-        tools: [], // No tools needed, just generation
+        tools: [],
+        includePartialMessages: true, // Enable real streaming
       }
     });
+
+    ws.send(JSON.stringify({ type: 'status', phase: 'thinking', message: 'Dreamware is dreaming...' }));
 
     // Process streaming messages
     for await (const message of agentQuery) {
       if (abortController.signal.aborted) break;
 
-      // Handle different message types
-      if (message.type === 'assistant') {
+      // Handle streaming partial messages (real-time token streaming)
+      if (message.type === 'stream_event') {
+        const event = message.event;
+
+        if (event.type === 'content_block_delta' && event.delta?.type === 'text_delta') {
+          const newText = event.delta.text;
+          fullResponse += newText;
+
+          // Check if we've hit the code block
+          if (fullResponse.includes('```html')) {
+            if (!codeStarted) {
+              codeStarted = true;
+              ws.send(JSON.stringify({ type: 'code_start' }));
+            }
+
+            // Extract code content
+            const codeMatch = fullResponse.match(/```html\n?([\s\S]*?)(?:```|$)/);
+            if (codeMatch) {
+              codeContent = codeMatch[1];
+              ws.send(JSON.stringify({ type: 'code', content: codeContent }));
+            }
+          } else {
+            // Still in analysis phase - send the text as it streams
+            const currentAnalysis = fullResponse.trim();
+            if (currentAnalysis !== lastAnalysisSent) {
+              ws.send(JSON.stringify({ type: 'analysis', content: currentAnalysis }));
+              lastAnalysisSent = currentAnalysis;
+            }
+          }
+        }
+      }
+      // Handle complete assistant messages (fallback)
+      else if (message.type === 'assistant') {
         const text = parseAgentMessage(message);
         if (text) {
           fullResponse = text;
-
-          // Update progress phases based on content length
-          const newPhase = Math.min(
-            Math.floor((fullResponse.length / 500) * phases.length),
-            phases.length - 1
-          );
-
-          if (newPhase > currentPhase) {
-            currentPhase = newPhase;
-            ws.send(JSON.stringify({
-              type: 'status',
-              phase: 'generating',
-              progress: phases[currentPhase].progress,
-              message: phases[currentPhase].message
-            }));
-          }
 
           // Check for code block
           const codeMatch = fullResponse.match(/```html\n?([\s\S]*?)```/);
@@ -171,17 +181,6 @@ async function handleGenerate(sessionId, prompt) {
               ws.send(JSON.stringify({ type: 'code_start' }));
             }
             ws.send(JSON.stringify({ type: 'code', content: codeContent }));
-          } else if (fullResponse.includes('```html')) {
-            // Code block started but not finished yet
-            const partialCode = fullResponse.split('```html')[1];
-            if (partialCode && !codeStarted) {
-              codeStarted = true;
-              ws.send(JSON.stringify({ type: 'code_start' }));
-            }
-            if (partialCode) {
-              ws.send(JSON.stringify({ type: 'code', content: partialCode }));
-              codeContent = partialCode;
-            }
           }
 
           // Send analysis text (before code block)
@@ -190,15 +189,17 @@ async function handleGenerate(sessionId, prompt) {
             ws.send(JSON.stringify({ type: 'analysis', content: analysisMatch[1].trim() }));
           }
         }
-      } else if (message.type === 'result') {
-        // Generation complete
+      }
+      // Handle system init message
+      else if (message.type === 'system' && message.subtype === 'init') {
         ws.send(JSON.stringify({
           type: 'status',
-          phase: 'complete',
-          progress: 100,
-          message: 'Your app is ready!'
+          phase: 'generating',
+          message: 'Dreamware is imagining your app...'
         }));
-
+      }
+      // Handle result
+      else if (message.type === 'result') {
         ws.send(JSON.stringify({
           type: 'complete',
           code: codeContent,

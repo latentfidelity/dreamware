@@ -22,6 +22,14 @@
                 #3B8DD4 100%
             );
             position: relative;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Allow text selection only in input fields */
+        input, textarea {
+            user-select: text;
+            -webkit-user-select: text;
         }
 
         .sky-container {
@@ -242,6 +250,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .logo {
@@ -250,6 +260,9 @@
             height: auto;
             filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15));
             animation: logo-float 6s ease-in-out infinite;
+            user-select: none;
+            -webkit-user-select: none;
+            cursor: default;
         }
 
         @keyframes logo-float {
@@ -303,7 +316,8 @@
             border: none;
             outline: none;
             position: relative;
-            z-index: 1;
+            z-index: 2;
+            caret-color: rgba(0, 0, 0, 0.6);
         }
 
         .glass-input::placeholder {
@@ -935,6 +949,104 @@
         .connection-status.connected .connection-dot {
             background: #22c55e;
         }
+
+        /* Enhanced Loading Experience */
+        .thinking-container {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .thinking-container.visible {
+            display: flex;
+        }
+
+        .thinking-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .thinking-orb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a78bfa, #f472b6, #fb923c);
+            animation: orb-pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+        }
+
+        @keyframes orb-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .thinking-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .thinking-dots {
+            display: inline-flex;
+            gap: 4px;
+            margin-left: 4px;
+        }
+
+        .thinking-dots span {
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: dot-bounce 1.4s ease-in-out infinite;
+        }
+
+        .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes dot-bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-6px); }
+        }
+
+        /* Live Thoughts Stream */
+        .thoughts-stream {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+            min-height: 60px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 12px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.6);
+            border-left: 2px solid rgba(167, 139, 250, 0.3);
+        }
+
+        .thoughts-stream::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .thoughts-stream::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+
+        .thought-line {
+            opacity: 0;
+            animation: thought-fade-in 0.3s ease forwards;
+        }
+
+        @keyframes thought-fade-in {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .thought-line.dimmed {
+            opacity: 0.4;
+        }
     </style>
 </head>
 <body>
@@ -985,13 +1097,9 @@
 
                     <!-- Code Section -->
                     <div class="code-section">
-                        <div class="dreaming-header">dreaming up your app...</div>
-
-                        <div class="loading-container" id="loadingContainer">
-                            <div class="loading-bar">
-                                <div class="loading-bar-fill" id="loadingBarFill"></div>
-                            </div>
-                            <div class="loading-text" id="loadingText">Initializing...</div>
+                        <!-- Shows real Claude output -->
+                        <div class="thinking-container" id="thinkingContainer">
+                            <div class="thoughts-stream" id="thoughtsStream"></div>
                         </div>
 
                         <div class="code-output" id="codeOutput"></div>
@@ -1013,9 +1121,8 @@
         const dreamInput = document.getElementById('dreamInput');
         const terminalOverlay = document.getElementById('terminalOverlay');
         const closeTerminal = document.getElementById('closeTerminal');
-        const loadingBarFill = document.getElementById('loadingBarFill');
-        const loadingText = document.getElementById('loadingText');
-        const loadingContainer = document.getElementById('loadingContainer');
+        const thinkingContainer = document.getElementById('thinkingContainer');
+        const thoughtsStream = document.getElementById('thoughtsStream');
         const codeOutput = document.getElementById('codeOutput');
         const phoneContainer = document.getElementById('phoneContainer');
         const appPreview = document.getElementById('appPreview');
@@ -1071,11 +1178,14 @@
                     showAnalysis(message.content);
                     break;
                 case 'code_start':
-                    loadingContainer.style.display = 'none';
-                    codeOutput.classList.add('visible');
+                    // Keep showing thinking, add "writing code" indicator
+                    showWritingCode();
                     break;
                 case 'code':
-                    updateCode(message.content);
+                    // Store code but don't display it (prevents flickering)
+                    currentCode = message.content;
+                    // Update preview periodically (throttled)
+                    throttledPreviewUpdate(message.content);
                     break;
                 case 'complete':
                     onGenerationComplete(message);
@@ -1089,36 +1199,49 @@
             }
         }
 
-        // Update loading status
+        // Update status display
         function updateStatus(status) {
-            if (status.progress !== undefined) {
-                loadingBarFill.style.width = status.progress + '%';
-            }
             if (status.message) {
-                loadingText.textContent = status.message;
+                thoughtsStream.innerHTML = `<div class="thought-line">${status.message}</div>`;
             }
         }
 
-        // Show analysis text
-        function showAnalysis(content) {
-            let analysisDiv = document.querySelector('.analysis-text');
-            if (!analysisDiv) {
-                analysisDiv = document.createElement('div');
-                analysisDiv.className = 'analysis-text';
-                codeOutput.parentNode.insertBefore(analysisDiv, codeOutput);
-            }
-            analysisDiv.textContent = content;
+        // Show streaming analysis text from Claude
+        function showAnalysis(text) {
+            thoughtsStream.innerHTML = `<div class="thought-line">${text}</div>`;
+            thoughtsStream.scrollTop = thoughtsStream.scrollHeight;
         }
 
-        // Update code display with syntax highlighting
-        function updateCode(code) {
-            currentCode = code;
+        // Show "writing code" indicator
+        let codeLineCount = 0;
+        function showWritingCode() {
+            codeLineCount = 0;
+            updateWritingProgress();
+        }
+
+        function updateWritingProgress() {
+            if (currentCode) {
+                codeLineCount = currentCode.split('\n').length;
+            }
+            thoughtsStream.innerHTML = `<div class="thought-line">Writing code... ${codeLineCount} lines generated</div>`;
+        }
+
+        // Throttled preview update (every 500ms max)
+        let lastPreviewUpdate = 0;
+        function throttledPreviewUpdate(code) {
+            const now = Date.now();
+            if (now - lastPreviewUpdate > 500) {
+                lastPreviewUpdate = now;
+                updatePreview(code);
+                updateWritingProgress();
+            }
+        }
+
+        // Update code display with syntax highlighting (only used on completion)
+        function displayFinalCode(code) {
             const highlighted = highlightCode(code);
-            codeOutput.innerHTML = highlighted + '<span class="cursor"></span>';
-            codeOutput.scrollTop = codeOutput.scrollHeight;
-
-            // Update live preview
-            updatePreview(code);
+            codeOutput.innerHTML = highlighted;
+            codeOutput.scrollTop = 0;
         }
 
         // Simple syntax highlighting for HTML
@@ -1160,15 +1283,16 @@
             isGenerating = false;
             currentCode = message.code;
 
-            // Remove cursor
-            const cursor = codeOutput.querySelector('.cursor');
-            if (cursor) cursor.remove();
+            // Hide thinking, show final code
+            thinkingContainer.classList.remove('visible');
+            codeOutput.classList.add('visible');
+            displayFinalCode(currentCode);
+
+            // Final preview update
+            updatePreview(currentCode);
 
             // Show download button
             downloadBtn.classList.add('visible');
-
-            // Update status
-            loadingText.textContent = 'Your app is ready!';
 
             console.log('Generation complete:', {
                 cost: message.cost,
@@ -1179,14 +1303,13 @@
         // Handle errors
         function onError(errorMessage) {
             isGenerating = false;
-            loadingText.textContent = 'Error: ' + errorMessage;
-            loadingBarFill.style.background = '#ef4444';
+            thoughtsStream.innerHTML = `<div class="thought-line" style="color: #ef4444;">Error: ${errorMessage}</div>`;
         }
 
         // Handle cancellation
         function onCancelled() {
             isGenerating = false;
-            loadingText.textContent = 'Generation cancelled';
+            thoughtsStream.innerHTML = `<div class="thought-line">Generation cancelled</div>`;
         }
 
         // Start generation
@@ -1205,21 +1328,15 @@
             currentCode = '';
 
             // Reset UI
-            loadingBarFill.style.width = '0%';
-            loadingBarFill.style.background = '';
-            loadingText.textContent = 'Connecting to Dreamware...';
-            loadingContainer.style.display = 'flex';
             codeOutput.classList.remove('visible');
             codeOutput.innerHTML = '';
             phoneContainer.classList.remove('visible');
             downloadBtn.classList.remove('visible');
+            thoughtsStream.innerHTML = '';
 
-            // Remove old analysis
-            const oldAnalysis = document.querySelector('.analysis-text');
-            if (oldAnalysis) oldAnalysis.remove();
-
-            // Show terminal
+            // Show terminal and thinking container
             terminalOverlay.classList.add('active');
+            thinkingContainer.classList.add('visible');
 
             // Send generation request
             ws.send(JSON.stringify({
@@ -1249,6 +1366,7 @@
                 ws.send(JSON.stringify({ type: 'cancel' }));
             }
             terminalOverlay.classList.remove('active');
+            thinkingContainer.classList.remove('visible');
             dreamInput.value = '';
         }
 
