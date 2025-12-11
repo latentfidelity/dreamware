@@ -74,25 +74,6 @@
             animation: rainbow-float 20s ease-in-out infinite;
         }
 
-        .rainbow-2 {
-            width: 600px;
-            height: 300px;
-            top: 50%;
-            right: -150px;
-            background: conic-gradient(
-                from 180deg at 50% 100%,
-                transparent 100deg,
-                rgba(255, 0, 0, 0.15) 110deg,
-                rgba(255, 127, 0, 0.15) 120deg,
-                rgba(255, 255, 0, 0.15) 130deg,
-                rgba(0, 255, 0, 0.15) 140deg,
-                rgba(0, 0, 255, 0.15) 150deg,
-                rgba(148, 0, 211, 0.15) 160deg,
-                transparent 170deg
-            );
-            animation: rainbow-float 25s ease-in-out infinite reverse;
-        }
-
         @keyframes rainbow-float {
             0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
             50% { transform: translateY(-20px) scale(1.05); opacity: 0.4; }
@@ -875,13 +856,91 @@
         .code-section::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.3);
         }
+
+        /* Live Preview Iframe */
+        .app-preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 28px;
+            background: linear-gradient(160deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        /* Analysis text */
+        .analysis-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid rgba(147, 197, 253, 0.5);
+        }
+
+        /* Download button */
+        .download-btn {
+            display: none;
+            margin-top: 16px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, rgba(147, 197, 253, 0.3), rgba(196, 181, 253, 0.3));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, rgba(147, 197, 253, 0.5), rgba(196, 181, 253, 0.5));
+            transform: translateY(-1px);
+        }
+
+        .download-btn.visible {
+            display: inline-block;
+        }
+
+        /* Connection status */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            font-size: 12px;
+            color: white;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .connection-status.visible {
+            opacity: 1;
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+
+        .connection-status.connected .connection-dot {
+            background: #22c55e;
+        }
     </style>
 </head>
 <body>
     <div class="sky-container">
-        <!-- Rainbows -->
+        <!-- Rainbow -->
         <div class="rainbow rainbow-1"></div>
-        <div class="rainbow rainbow-2"></div>
 
         <!-- Clouds -->
         <div class="cloud cloud-1"></div>
@@ -919,95 +978,7 @@
                     <div class="phone-container" id="phoneContainer">
                         <div class="phone-frame">
                             <div class="phone-screen">
-                                <div class="app-container">
-                                    <div class="app-status-bar">
-                                        <span>9:41</span>
-                                        <div class="app-status-icons">
-                                            <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><path d="M1 4h2v8H1zM5 2h2v10H5zM9 0h2v12H9zM13 3h2v9h-2z" opacity="0.9"/></svg>
-                                            <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><path d="M14 2H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-1 5H3V5h10v2z" opacity="0.9"/></svg>
-                                        </div>
-                                    </div>
-                                    <div class="app-header">
-                                        <div class="app-title" id="appTitle">My new app</div>
-                                        <div class="app-subtitle">Dashboard Overview</div>
-                                    </div>
-                                    <div class="app-content">
-                                        <!-- Stats Widget -->
-                                        <div class="widget widget-stats">
-                                            <div class="widget-stats-row">
-                                                <div class="stat-item">
-                                                    <div class="stat-value">2.4k</div>
-                                                    <div class="stat-label">Users</div>
-                                                </div>
-                                                <div class="stat-item">
-                                                    <div class="stat-value">$12k</div>
-                                                    <div class="stat-label">Revenue</div>
-                                                </div>
-                                                <div class="stat-item">
-                                                    <div class="stat-value">89%</div>
-                                                    <div class="stat-label">Growth</div>
-                                                </div>
-                                            </div>
-                                            <div class="widget-progress">
-                                                <div class="widget-progress-fill"></div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Chart Widget -->
-                                        <div class="widget widget-chart">
-                                            <div class="chart-bar" style="height: 45%"></div>
-                                            <div class="chart-bar" style="height: 65%"></div>
-                                            <div class="chart-bar" style="height: 35%"></div>
-                                            <div class="chart-bar" style="height: 80%"></div>
-                                            <div class="chart-bar" style="height: 55%"></div>
-                                            <div class="chart-bar" style="height: 90%"></div>
-                                            <div class="chart-bar" style="height: 70%"></div>
-                                        </div>
-
-                                        <!-- Mini Cards -->
-                                        <div class="widget-cards">
-                                            <div class="mini-card">
-                                                <div class="mini-card-icon">⚡</div>
-                                                <div class="mini-card-text">Quick</div>
-                                            </div>
-                                            <div class="mini-card">
-                                                <div class="mini-card-icon">🎯</div>
-                                                <div class="mini-card-text">Goals</div>
-                                            </div>
-                                            <div class="mini-card">
-                                                <div class="mini-card-icon">✨</div>
-                                                <div class="mini-card-text">New</div>
-                                            </div>
-                                        </div>
-
-                                        <!-- List Widget -->
-                                        <div class="widget widget-list">
-                                            <div class="list-item">
-                                                <div class="list-dot green"></div>
-                                                <span class="list-text">Design system</span>
-                                                <span class="list-badge">Done</span>
-                                            </div>
-                                            <div class="list-item">
-                                                <div class="list-dot blue"></div>
-                                                <span class="list-text">API integration</span>
-                                                <span class="list-badge">75%</span>
-                                            </div>
-                                            <div class="list-item">
-                                                <div class="list-dot purple"></div>
-                                                <span class="list-text">Testing</span>
-                                                <span class="list-badge">New</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Bottom Nav -->
-                                    <div class="app-nav">
-                                        <div class="nav-item active"><div class="nav-dot"></div></div>
-                                        <div class="nav-item"><div class="nav-dot"></div></div>
-                                        <div class="nav-item"><div class="nav-dot"></div></div>
-                                        <div class="nav-item"><div class="nav-dot"></div></div>
-                                    </div>
-                                </div>
+                                <iframe id="appPreview" class="app-preview-iframe"></iframe>
                             </div>
                         </div>
                     </div>
@@ -1024,13 +995,21 @@
                         </div>
 
                         <div class="code-output" id="codeOutput"></div>
+                        <button class="download-btn" id="downloadBtn">Download App</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Connection Status -->
+    <div class="connection-status" id="connectionStatus">
+        <div class="connection-dot"></div>
+        <span id="connectionText">Disconnected</span>
+    </div>
+
     <script>
+        // DOM Elements
         const dreamInput = document.getElementById('dreamInput');
         const terminalOverlay = document.getElementById('terminalOverlay');
         const closeTerminal = document.getElementById('closeTerminal');
@@ -1039,125 +1018,238 @@
         const loadingContainer = document.getElementById('loadingContainer');
         const codeOutput = document.getElementById('codeOutput');
         const phoneContainer = document.getElementById('phoneContainer');
-        const appTitle = document.getElementById('appTitle');
+        const appPreview = document.getElementById('appPreview');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const connectionText = document.getElementById('connectionText');
 
-        const loadingSteps = [
-            { progress: 15, text: 'Analyzing requirements...' },
-            { progress: 30, text: 'Designing component architecture...' },
-            { progress: 45, text: 'Generating styles...' },
-            { progress: 60, text: 'Building layout system...' },
-            { progress: 75, text: 'Optimizing for performance...' },
-            { progress: 90, text: 'Finalizing code...' },
-            { progress: 100, text: 'Complete!' }
-        ];
+        // State
+        let ws = null;
+        let currentCode = '';
+        let isGenerating = false;
 
-        function generateCSS(appName) {
-            const slug = appName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-            return [
-                { type: 'comment', text: `/* ${appName} - Generated by Dreamware */` },
-                { type: 'blank', text: '' },
-                { type: 'selector', text: `.${slug}-container` },
-                { type: 'bracket', text: '{' },
-                { type: 'property', text: '  display', value: 'flex' },
-                { type: 'property', text: '  flex-direction', value: 'column' },
-                { type: 'property', text: '  min-height', value: '100vh' },
-                { type: 'property', text: '  background', value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-                { type: 'bracket', text: '}' },
-                { type: 'blank', text: '' },
-                { type: 'selector', text: `.${slug}-header` },
-                { type: 'bracket', text: '{' },
-                { type: 'property', text: '  padding', value: '2rem' },
-                { type: 'property', text: '  backdrop-filter', value: 'blur(20px)' },
-                { type: 'property', text: '  background', value: 'rgba(255, 255, 255, 0.1)' },
-                { type: 'property', text: '  border-bottom', value: '1px solid rgba(255, 255, 255, 0.2)' },
-                { type: 'bracket', text: '}' },
-                { type: 'blank', text: '' },
-                { type: 'selector', text: `.${slug}-title` },
-                { type: 'bracket', text: '{' },
-                { type: 'property', text: '  font-size', value: '2.5rem' },
-                { type: 'property', text: '  font-weight', value: '700' },
-                { type: 'property', text: '  color', value: '#ffffff' },
-                { type: 'property', text: '  text-shadow', value: '0 2px 10px rgba(0, 0, 0, 0.2)' },
-                { type: 'bracket', text: '}' },
-                { type: 'blank', text: '' },
-                { type: 'selector', text: `.${slug}-content` },
-                { type: 'bracket', text: '{' },
-                { type: 'property', text: '  flex', value: '1' },
-                { type: 'property', text: '  padding', value: '3rem' },
-                { type: 'property', text: '  display', value: 'grid' },
-                { type: 'property', text: '  gap', value: '2rem' },
-                { type: 'bracket', text: '}' },
-            ];
+        // WebSocket connection
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}`;
+
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                console.log('Connected to Dreamware server');
+                connectionStatus.classList.add('visible', 'connected');
+                connectionText.textContent = 'Connected';
+                setTimeout(() => connectionStatus.classList.remove('visible'), 2000);
+            };
+
+            ws.onclose = () => {
+                console.log('Disconnected from server');
+                connectionStatus.classList.add('visible');
+                connectionStatus.classList.remove('connected');
+                connectionText.textContent = 'Disconnected';
+                // Attempt to reconnect after 3 seconds
+                setTimeout(connectWebSocket, 3000);
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                handleServerMessage(message);
+            };
         }
 
-        function formatCodeLine(line) {
-            if (line.type === 'comment') {
-                return `<span class="code-comment">${line.text}</span>`;
-            } else if (line.type === 'selector') {
-                return `<span class="code-selector">${line.text}</span>`;
-            } else if (line.type === 'bracket') {
-                return `<span class="code-bracket">${line.text}</span>`;
-            } else if (line.type === 'property') {
-                return `<span class="code-property">${line.text}</span>: <span class="code-value">${line.value}</span>;`;
-            } else if (line.type === 'blank') {
-                return '&nbsp;';
-            }
-            return line.text;
-        }
-
-        async function runLoadingSequence() {
-            for (let i = 0; i < loadingSteps.length; i++) {
-                const step = loadingSteps[i];
-                loadingBarFill.style.width = step.progress + '%';
-                loadingText.textContent = step.text;
-                await new Promise(resolve => setTimeout(resolve, 400));
+        // Handle messages from server
+        function handleServerMessage(message) {
+            switch (message.type) {
+                case 'status':
+                    updateStatus(message);
+                    break;
+                case 'analysis':
+                    showAnalysis(message.content);
+                    break;
+                case 'code_start':
+                    loadingContainer.style.display = 'none';
+                    codeOutput.classList.add('visible');
+                    break;
+                case 'code':
+                    updateCode(message.content);
+                    break;
+                case 'complete':
+                    onGenerationComplete(message);
+                    break;
+                case 'error':
+                    onError(message.message);
+                    break;
+                case 'cancelled':
+                    onCancelled();
+                    break;
             }
         }
 
-        async function typeCode(appName) {
-            const lines = generateCSS(appName);
-            codeOutput.innerHTML = '';
-            codeOutput.classList.add('visible');
+        // Update loading status
+        function updateStatus(status) {
+            if (status.progress !== undefined) {
+                loadingBarFill.style.width = status.progress + '%';
+            }
+            if (status.message) {
+                loadingText.textContent = status.message;
+            }
+        }
 
-            for (let i = 0; i < lines.length; i++) {
-                const lineDiv = document.createElement('div');
-                lineDiv.className = 'code-line';
-                lineDiv.style.animationDelay = `${i * 0.05}s`;
-                lineDiv.innerHTML = formatCodeLine(lines[i]);
-                codeOutput.appendChild(lineDiv);
-                await new Promise(resolve => setTimeout(resolve, 80));
+        // Show analysis text
+        function showAnalysis(content) {
+            let analysisDiv = document.querySelector('.analysis-text');
+            if (!analysisDiv) {
+                analysisDiv = document.createElement('div');
+                analysisDiv.className = 'analysis-text';
+                codeOutput.parentNode.insertBefore(analysisDiv, codeOutput);
+            }
+            analysisDiv.textContent = content;
+        }
+
+        // Update code display with syntax highlighting
+        function updateCode(code) {
+            currentCode = code;
+            const highlighted = highlightCode(code);
+            codeOutput.innerHTML = highlighted + '<span class="cursor"></span>';
+            codeOutput.scrollTop = codeOutput.scrollHeight;
+
+            // Update live preview
+            updatePreview(code);
+        }
+
+        // Simple syntax highlighting for HTML
+        function highlightCode(code) {
+            return code
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/(\/\/.*$|\/\*[\s\S]*?\*\/|&lt;!--[\s\S]*?--&gt;)/gm, '<span class="code-comment">$1</span>')
+                .replace(/(&lt;\/?[\w-]+)/g, '<span class="code-selector">$1</span>')
+                .replace(/(\s)([\w-]+)(=)/g, '$1<span class="code-property">$2</span>$3')
+                .replace(/(["'])(.*?)\1/g, '<span class="code-value">$1$2$1</span>')
+                .replace(/([{}()])/g, '<span class="code-bracket">$1</span>')
+                .split('\n')
+                .map(line => `<div class="code-line">${line || '&nbsp;'}</div>`)
+                .join('');
+        }
+
+        // Update the live preview iframe
+        function updatePreview(code) {
+            if (!code.trim()) return;
+
+            try {
+                const blob = new Blob([code], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                appPreview.src = url;
+
+                // Show phone container
+                if (!phoneContainer.classList.contains('visible')) {
+                    phoneContainer.classList.add('visible');
+                }
+            } catch (error) {
+                console.error('Preview error:', error);
+            }
+        }
+
+        // Generation complete
+        function onGenerationComplete(message) {
+            isGenerating = false;
+            currentCode = message.code;
+
+            // Remove cursor
+            const cursor = codeOutput.querySelector('.cursor');
+            if (cursor) cursor.remove();
+
+            // Show download button
+            downloadBtn.classList.add('visible');
+
+            // Update status
+            loadingText.textContent = 'Your app is ready!';
+
+            console.log('Generation complete:', {
+                cost: message.cost,
+                usage: message.usage
+            });
+        }
+
+        // Handle errors
+        function onError(errorMessage) {
+            isGenerating = false;
+            loadingText.textContent = 'Error: ' + errorMessage;
+            loadingBarFill.style.background = '#ef4444';
+        }
+
+        // Handle cancellation
+        function onCancelled() {
+            isGenerating = false;
+            loadingText.textContent = 'Generation cancelled';
+        }
+
+        // Start generation
+        function startDreaming(prompt) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert('Not connected to server. Please wait...');
+                return;
             }
 
-            // Add cursor at the end
-            const cursorSpan = document.createElement('span');
-            cursorSpan.className = 'cursor';
-            codeOutput.appendChild(cursorSpan);
-        }
+            if (isGenerating) {
+                ws.send(JSON.stringify({ type: 'cancel' }));
+                return;
+            }
 
-        async function showPhonePreview(appName) {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            appTitle.textContent = appName;
-            phoneContainer.classList.add('visible');
-        }
+            isGenerating = true;
+            currentCode = '';
 
-        async function startDreaming(prompt) {
-            // Reset state
+            // Reset UI
             loadingBarFill.style.width = '0%';
-            loadingText.textContent = 'Initializing...';
+            loadingBarFill.style.background = '';
+            loadingText.textContent = 'Connecting to Dreamware...';
             loadingContainer.style.display = 'flex';
             codeOutput.classList.remove('visible');
             codeOutput.innerHTML = '';
             phoneContainer.classList.remove('visible');
+            downloadBtn.classList.remove('visible');
+
+            // Remove old analysis
+            const oldAnalysis = document.querySelector('.analysis-text');
+            if (oldAnalysis) oldAnalysis.remove();
 
             // Show terminal
             terminalOverlay.classList.add('active');
 
-            // Run sequence
-            await runLoadingSequence();
-            await new Promise(resolve => setTimeout(resolve, 300));
-            loadingContainer.style.display = 'none';
-            await typeCode(prompt);
-            await showPhonePreview(prompt);
+            // Send generation request
+            ws.send(JSON.stringify({
+                type: 'generate',
+                prompt: prompt
+            }));
+        }
+
+        // Download generated app
+        function downloadApp() {
+            if (!currentCode) return;
+
+            const blob = new Blob([currentCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'dreamware-app.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Close terminal and cancel if generating
+        function closeTerminalPanel() {
+            if (isGenerating && ws) {
+                ws.send(JSON.stringify({ type: 'cancel' }));
+            }
+            terminalOverlay.classList.remove('active');
+            dreamInput.value = '';
         }
 
         // Event listeners
@@ -1167,17 +1259,18 @@
             }
         });
 
-        closeTerminal.addEventListener('click', () => {
-            terminalOverlay.classList.remove('active');
-            dreamInput.value = '';
-        });
+        closeTerminal.addEventListener('click', closeTerminalPanel);
 
         terminalOverlay.addEventListener('click', (e) => {
             if (e.target === terminalOverlay) {
-                terminalOverlay.classList.remove('active');
-                dreamInput.value = '';
+                closeTerminalPanel();
             }
         });
+
+        downloadBtn.addEventListener('click', downloadApp);
+
+        // Initialize WebSocket connection
+        connectWebSocket();
     </script>
 </body>
 </html>
